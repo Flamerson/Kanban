@@ -1,0 +1,69 @@
+type Projeto {
+    id: ID!
+    nome:String
+    status:String
+    responsavel: [Responsavel]
+    inicioPrevisto: String
+    terminoPrevisto: String
+    inicioRealizado: String
+    terminoRealizado: String
+    diasDeAtraso: Boolean
+    percentualDeTempoRestante: String
+    createdAt: String
+    updatedAt: String
+}
+
+enum Status {
+    AIniciar
+    EmAndamento
+    Atrasado
+    Concluido
+}
+
+type Responsavel{
+    id: ID
+    nome: String
+    email: String!
+    cargo: String
+    secretaria: Secretaria
+}
+
+input ResponsavelInput{
+    id: ID
+    nome: String
+    email: String
+    cargo: String
+    secretaria: SecretariaInput
+}
+
+type Secretaria{
+    id: ID
+    nome: String
+}
+
+input SecretariaInput{
+    id: ID
+    nome: String
+}
+
+type Query {
+    listar: [Projeto]
+    buscarPorId(id: ID): Projeto
+    listarSecretaria: [Secretaria]
+    listarSecretariaPorId(id: ID): Secretaria
+    listarResponsaveis: [Responsavel]
+    listarResponvalPorId(id: ID): Responsavel
+}
+
+type Mutation{
+    criar(nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String,diasDeAtraso: Boolean, percentualDeTempoRestante: String) : Projeto
+    atualizar(id: ID, nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String,diasDeAtraso: Boolean, percentualDeTempoRestante: String): Projeto
+    deletar(id: ID): Projeto
+    criarSecretaria(nome: String): Secretaria
+    atualizarSecretaria(id: ID, nome: String): Secretaria
+    deletarSecretaria(id: ID): Secretaria
+    criarResponsavel(nome: String, email: String, cargo: String, secretaria: SecretariaInput): Responsavel
+    atualizarResponsavel(id: ID, nome: String, email: String, cargo: String, secretaria: SecretariaInput): Responsavel
+    deletarResponsavel(id: ID): Responsavel
+}
+
