@@ -1,7 +1,7 @@
 type Projeto {
-    id: ID!
+    id: ID
     nome:String
-    status:String
+    status:Status
     responsavel: [Responsavel]
     inicioPrevisto: String
     terminoPrevisto: String
@@ -49,6 +49,7 @@ input SecretariaInput{
 type Query {
     listar: [Projeto]
     buscarPorId(id: ID): Projeto
+    listarPorStatus(status: Status): [Projeto]
     listarSecretaria: [Secretaria]
     listarSecretariaPorId(id: ID): Secretaria
     listarResponsaveis: [Responsavel]
@@ -57,7 +58,8 @@ type Query {
 
 type Mutation{
     criar(nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String,diasDeAtraso: Boolean, percentualDeTempoRestante: String) : Projeto
-    atualizar(id: ID, nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String,diasDeAtraso: Boolean, percentualDeTempoRestante: String): Projeto
+    atualizar(id: ID, nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String): Projeto
+    atualizarStatus(id: ID, status: Status ): Projeto
     deletar(id: ID): Projeto
     criarSecretaria(nome: String): Secretaria
     atualizarSecretaria(id: ID, nome: String): Secretaria

@@ -1,5 +1,6 @@
 package com.flamerson.kanban.services;
 
+import com.flamerson.kanban.exception.BusinessException;
 import com.flamerson.kanban.models.Secretaria;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,12 @@ public class SecretariaService {
             return secretarias.get(id);
         }
 
-        throw new IllegalArgumentException("Secretaria não encontrada!");
+        throw new BusinessException("Secretaria não encontrada!");
     }
 
     public Optional<Secretaria> deletarSecretaria(String id){
         var secretariaEncontrada = listarSecretariaPorId(id);
-        secretariaEncontrada.orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado!"));
+        secretariaEncontrada.orElseThrow(() -> new BusinessException("Projeto não encontrado!"));
         secretarias.remove(id);
         return secretariaEncontrada;
     }
