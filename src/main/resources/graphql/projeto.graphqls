@@ -7,7 +7,7 @@ type Projeto {
     terminoPrevisto: String
     inicioRealizado: String
     terminoRealizado: String
-    diasDeAtraso: Boolean
+    diasDeAtraso: Int
     percentualDeTempoRestante: String
     createdAt: String
     updatedAt: String
@@ -57,7 +57,7 @@ type Query {
 }
 
 type Mutation{
-    criar(nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String,diasDeAtraso: Boolean, percentualDeTempoRestante: String) : Projeto
+    criar(nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String) : Projeto
     atualizar(id: ID, nome: String, status: Status, responsavel: [ResponsavelInput], inicioPrevisto: String, terminoPrevisto: String,inicioRealizado: String, terminoRealizado: String): Projeto
     atualizarStatus(id: ID, status: Status ): Projeto
     deletar(id: ID): Projeto

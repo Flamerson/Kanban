@@ -7,6 +7,7 @@ import com.flamerson.kanban.models.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,8 +18,10 @@ public class ProjetoService {
 
     private final Map<String, Projeto> projetos = new HashMap<>();
 
-    public Projeto criar(String nome, Status status, List<Responsavel> responsavel, LocalDateTime inicioPrevisto, LocalDateTime terminoPrevisto, LocalDateTime inicioRealizado, LocalDateTime terminoRealizado, Number diasDeAtraso, String percentualDeTempoRestante) {
+    public Projeto criar(String nome, Status status, List<Responsavel> responsavel, LocalDateTime inicioPrevisto, LocalDateTime terminoPrevisto, LocalDateTime inicioRealizado, LocalDateTime terminoRealizado) {
         var horarioExato = LocalDateTime.now();
+        int diasDeAtraso = 0;
+        var percentualDeTempoRestante = "0";
 
         // Regras para criação de tarefas, por status.
         if(status == Status.AIniciar && (inicioRealizado != null || terminoRealizado != null)){
@@ -48,6 +51,10 @@ public class ProjetoService {
 
         if(status == Status.Concluido && terminoRealizado == null){
             throw new BusinessException("Verifique as datas antes de criar a tarefa em Concluido!");
+        }
+
+        if(status != Status.Concluido && status != Status.AIniciar){
+            diasDeAtraso = verificaAtraso(inicioPrevisto, terminoPrevisto);
         }
 
         var projeto = new Projeto(UUID.randomUUID().toString(), nome, status , responsavel, inicioPrevisto, terminoPrevisto, inicioRealizado, terminoRealizado, diasDeAtraso, percentualDeTempoRestante, horarioExato, horarioExato);
@@ -80,34 +87,29 @@ public class ProjetoService {
             var horarioExato = LocalDateTime.now();
 
             if(status != projetos.get(id).status()){
-                if(projetos.get(id).status() == Status.AIniciar && status == Status.EmAndamento){
-                    if(inicioRealizado == null){
+                if((projetos.get(id).status() == Status.AIniciar || projetos.get(id).status() == Status.Concluido) && status == Status.EmAndamento){
+                    if(inicioRealizado == null || projetos.get(id).inicioRealizado() == null){
                         inicioRealizado = LocalDateTime.now();
                     }
+                    terminoRealizado = null;
                 }
 
                 if(projetos.get(id).status() == Status.AIniciar && status == Status.Atrasado){
-                    if(inicioPrevisto.isAfter(LocalDateTime.now())){
-                        throw new BusinessException("Verifique a data antes de atualizar o status!");
+                    if(inicioPrevisto.isAfter(LocalDateTime.now()) || projetos.get(id).inicioRealizado().isAfter(LocalDateTime.now())){
+                        throw new BusinessException("Verifique a data de inicio realizado antes de atualizar o status!");
                     }
                 }
 
-                if(projetos.get(id).status() == Status.AIniciar && status == Status.Concluido){
+                if(status == Status.Concluido){
                     if(terminoRealizado == null){
                         terminoRealizado = LocalDateTime.now();
                     }
                 }
 
-                if(projetos.get(id).status() == Status.EmAndamento && status == Status.Concluido){
-                    if(terminoRealizado == null){
-                        terminoRealizado = LocalDateTime.now();
-                    }
-                }
-
-                if(projetos.get(id).status() == Status.EmAndamento && status == Status.AIniciar){
-                    if(inicioRealizado != null){
-                        inicioRealizado = null;
-                    }
+                if(status == Status.AIniciar){
+                    inicioRealizado = null;
+                    inicioPrevisto = LocalDateTime.now();
+                    terminoPrevisto = LocalDateTime.now();
                 }
 
                 if(projetos.get(id).status() == Status.EmAndamento && status == Status.Atrasado){
@@ -115,39 +117,14 @@ public class ProjetoService {
                     terminoRealizado = LocalDateTime.now();
                 }
 
-                if(projetos.get(id).status() == Status.Atrasado && status == Status.AIniciar){
-                    inicioRealizado = null;
-                    inicioPrevisto = LocalDateTime.now();
-                    terminoPrevisto = LocalDateTime.now();
-                }
-
                 if(projetos.get(id).status() == Status.Atrasado && status == Status.EmAndamento){
-                    if(inicioRealizado.isAfter(LocalDateTime.now()) || terminoRealizado.isAfter(LocalDateTime.now())){
+                    if((inicioRealizado.isAfter(LocalDateTime.now()) || terminoRealizado.isAfter(LocalDateTime.now()) || (projetos.get(id).inicioRealizado().isAfter(LocalDateTime.now()) || projetos.get(id).terminoPrevisto().isAfter(LocalDateTime.now())))){
                         throw new BusinessException("Não é possivel alterar o status pois as datas são maiores que a data atual.");
                     }
                 }
 
-                if(projetos.get(id).status() == Status.Atrasado && status == Status.Concluido){
-                    if(terminoRealizado == null){
-                        terminoRealizado = LocalDateTime.now();
-                    }
-                }
-
-                if(projetos.get(id).status() == Status.Concluido && status == Status.AIniciar){
-                    inicioRealizado = null;
-                    inicioPrevisto = LocalDateTime.now();
-                    terminoPrevisto = LocalDateTime.now();
-                }
-
-                if(projetos.get(id).status() == Status.Concluido && status == Status.EmAndamento){
-                    if(inicioRealizado.isAfter(LocalDateTime.now())){
-                        status = Status.Atrasado;
-                    }
-                    terminoRealizado = null;
-                }
-
                 if(projetos.get(id).status() == Status.Concluido && status == Status.Atrasado){
-                    if(!inicioRealizado.isAfter(LocalDateTime.now())){
+                    if(!inicioRealizado.isAfter(LocalDateTime.now()) || !projetos.get(id).inicioRealizado().isAfter(LocalDateTime.now())){
                         throw new BusinessException("Não é possivel a atualização de status pois, não cumpre os requistos de data!");
                     }
                     terminoRealizado = null;
@@ -155,15 +132,7 @@ public class ProjetoService {
 
             }else{
 
-                if(inicioPrevisto != null && status != Status.EmAndamento){
-                    status = Status.EmAndamento;
-                }
-
-                if(inicioRealizado != null && status != Status.EmAndamento){
-                    status = Status.EmAndamento;
-                }
-
-                if(terminoPrevisto != null && status != Status.EmAndamento){
+                if((inicioPrevisto != null || inicioRealizado != null || terminoPrevisto != null ) && status != Status.EmAndamento){
                     status = Status.EmAndamento;
                 }
 
@@ -184,6 +153,33 @@ public class ProjetoService {
         var horarioExato = LocalDateTime.now();
         projetos.put(id, new Projeto(id, projetoEncontrado.get().nome(), status, projetoEncontrado.get().responsavels(), projetoEncontrado.get().inicioPrevisto(), projetoEncontrado.get().terminoPrevisto(), projetoEncontrado.get().inicioRealizado(), projetoEncontrado.get().terminoRealizado(), projetoEncontrado.get().diasDeAtraso(), projetoEncontrado.get().percentualDeTempoRestante(), projetoEncontrado.get().createdAt(), horarioExato ));
         return projetos.get(id);
+    }
+
+    public int verificaAtraso(LocalDateTime inicioPrevisto, LocalDateTime terminoPrevisto) {
+
+        if (inicioPrevisto == null) {
+            return 0;
+        }
+
+        LocalDate hoje = LocalDate.now();
+
+        LocalDate inicio = inicioPrevisto.toLocalDate();
+
+        if (inicio.isAfter(hoje)) {
+            return 0;
+        }
+
+        LocalDate termino = terminoPrevisto.toLocalDate();
+
+        long total = java.time.temporal.ChronoUnit.DAYS.between(inicio, termino);
+        long usado = java.time.temporal.ChronoUnit.DAYS.between(inicio, hoje);
+        long restante = total - usado;
+
+        if (total <= 0) return 0;
+        if (hoje.isAfter(termino)) return 0;
+        if (restante < 0) return 0;
+
+        return (int) restante;
     }
 
 }
