@@ -1,5 +1,6 @@
 package com.flamerson.kanban.services;
 
+import com.flamerson.kanban.exception.BusinessException;
 import com.flamerson.kanban.models.Responsavel;
 import com.flamerson.kanban.models.Secretaria;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ public class ResponsavelService {
 
     public Responsavel criarResponsavel(String nome, String email, String cargo, Secretaria secretaria){
         if (responsaveis.values().stream().anyMatch(r -> r.email().equalsIgnoreCase(email))) {
-            throw new IllegalArgumentException("Email já cadastrado!");
+            throw new BusinessException("Email já cadastrado!");
         }
         var responsavel = new Responsavel(UUID.randomUUID().toString(), nome, email,cargo, secretaria);
         responsaveis.put(responsavel.id(), responsavel);
@@ -37,12 +38,12 @@ public class ResponsavelService {
             return responsaveis.get(id);
         }
 
-        throw new IllegalArgumentException("Responsável não encontrado!");
+        throw new BusinessException("Responsável não encontrado!");
     }
 
     public Optional<Responsavel> deletarResponsavel(String id){
         var responsavelEncontrado = listarReponsavelPorId(id);
-        responsavelEncontrado.orElseThrow(() -> new IllegalArgumentException("Responsável não encontrado!"));
+        responsavelEncontrado.orElseThrow(() -> new BusinessException("Responsável não encontrado!"));
         responsaveis.remove(id);
 
         return responsavelEncontrado;

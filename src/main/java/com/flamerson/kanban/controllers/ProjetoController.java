@@ -37,9 +37,19 @@ public class ProjetoController {
         return projetoService.buscarPorId(id);
     }
 
+    @QueryMapping
+    public List<Projeto> listarPorStatus(@Argument final Status status){
+        return projetoService.listarPorStatus(status);
+    }
+
     @MutationMapping
-    public Projeto atualizar(@Argument String id, @Argument String nome, @Argument Status status, @Argument List<Responsavel> responsavel, @Argument LocalDateTime inicioPrevisto, @Argument LocalDateTime terminoPrevisto, @Argument LocalDateTime inicioRealizado, @Argument LocalDateTime terminoRealizado, @Argument Number diasDeAtraso, @Argument String percentualDeTempoRestante){
-        return projetoService.atualizar(id, nome, status, responsavel, inicioPrevisto, terminoPrevisto, inicioRealizado, terminoRealizado, diasDeAtraso, percentualDeTempoRestante);
+    public Projeto atualizar(@Argument String id, @Argument String nome, @Argument Status status, @Argument List<Responsavel> responsavel, @Argument LocalDateTime inicioPrevisto, @Argument LocalDateTime terminoPrevisto, @Argument LocalDateTime inicioRealizado, @Argument LocalDateTime terminoRealizado){
+        return projetoService.atualizar(id, nome, status, responsavel, inicioPrevisto, terminoPrevisto, inicioRealizado, terminoRealizado);
+    }
+
+    @MutationMapping
+    public Projeto atualizarStatus(@Argument String id, @Argument Status status){
+        return projetoService.atualizarStatus(id, status);
     }
 
     @MutationMapping
