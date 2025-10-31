@@ -23,8 +23,8 @@ public class ProjetoController {
     }
 
     @MutationMapping
-    public Projeto criar(@Argument String nome ,@Argument Status status, @Argument List<Responsavel> responsavel, @Argument LocalDateTime inicioPrevisto, @Argument LocalDateTime terminoPrevisto, @Argument LocalDateTime inicioRealizado, @Argument LocalDateTime terminoRealizado, @Argument Number diasDeAtraso, @Argument String percentualDeTempoRestante){
-        return projetoService.criar(nome, status, responsavel, inicioPrevisto, terminoPrevisto, inicioRealizado, terminoRealizado, diasDeAtraso, percentualDeTempoRestante);
+    public Projeto criar(@Argument String nome ,@Argument Status status, @Argument List<Responsavel> responsavel, @Argument LocalDateTime inicioPrevisto, @Argument LocalDateTime terminoPrevisto, @Argument LocalDateTime inicioRealizado, @Argument LocalDateTime terminoRealizado){
+        return projetoService.criar(nome, status, responsavel, inicioPrevisto, terminoPrevisto, inicioRealizado, terminoRealizado);
     }
 
     @QueryMapping

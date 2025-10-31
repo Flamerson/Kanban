@@ -36,9 +36,7 @@ class ProjetoServiceTest {
                 now.plusDays(1),
                 now.plusDays(3),
                 now,
-                now.plusDays(2),
-                0,
-                "100%"
+                now.plusDays(2)
         );
 
         assertNotNull(projeto.id());
@@ -57,9 +55,7 @@ class ProjetoServiceTest {
                 now.minusDays(3),
                 now.minusDays(1),
                 null,
-                null,
-                0,
-                "0%"
+                null
         ));
     }
 
@@ -73,9 +69,7 @@ class ProjetoServiceTest {
                 now,
                 now.plusDays(2),
                 null,
-                null,
-                0,
-                "0%"
+                null
         );
 
         assertNotNull(projeto.inicioRealizado());
@@ -85,8 +79,8 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("Deve listar todos os projetos criados")
     void listarProjetos() {
-        projetoService.criar("Projeto 1", Status.AIniciar, List.of(), now, now.plusDays(1), null, null, 0, "0%");
-        projetoService.criar("Projeto 2", Status.Concluido, List.of(), now, now.plusDays(1), now, now.plusDays(1), 0, "100%");
+        projetoService.criar("Projeto 1", Status.AIniciar, List.of(), now, now.plusDays(1), null, null);
+        projetoService.criar("Projeto 2", Status.Concluido, List.of(), now, now.plusDays(1), now, now.plusDays(1));
 
         var lista = projetoService.listar();
 
@@ -96,7 +90,7 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("Deve buscar projeto por ID existente")
     void buscarPorId() {
-        var criado = projetoService.criar("Projeto ID", Status.AIniciar, List.of(), now, now.plusDays(1), null, null, 0, "0%");
+        var criado = projetoService.criar("Projeto ID", Status.AIniciar, List.of(), now, now.plusDays(1), null, null);
 
         Optional<Projeto> encontrado = projetoService.buscarPorId(criado.id());
 
@@ -107,8 +101,8 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("Deve listar projetos por status")
     void listarPorStatus() {
-        projetoService.criar("Projeto 1", Status.AIniciar, List.of(), now, now.plusDays(1), null, null, 0, "0%");
-        projetoService.criar("Projeto 2", Status.Concluido, List.of(), now, now.plusDays(1), now, now.plusDays(1), 0, "100%");
+        projetoService.criar("Projeto 1", Status.AIniciar, List.of(), now, now.plusDays(1), null, null);
+        projetoService.criar("Projeto 2", Status.Concluido, List.of(), now, now.plusDays(1), now, now.plusDays(1));
 
         var lista = projetoService.listarPorStatus(Status.Concluido);
 
@@ -119,7 +113,7 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("Deve deletar um projeto existente")
     void deletarProjeto() {
-        var criado = projetoService.criar("Projeto Delete", Status.AIniciar, List.of(), now, now.plusDays(1), null, null, 0, "0%");
+        var criado = projetoService.criar("Projeto Delete", Status.AIniciar, List.of(), now, now.plusDays(1), null, null);
 
         var deletado = projetoService.deletar(criado.id());
 
@@ -136,7 +130,7 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("Deve atualizar o nome e status de um projeto existente")
     void atualizarProjeto() {
-        var criado = projetoService.criar("Projeto Original", Status.AIniciar, List.of(), now, now.plusDays(2), null, null, 0, "0%");
+        var criado = projetoService.criar("Projeto Original", Status.AIniciar, List.of(), now, now.plusDays(2), null, null);
 
         var atualizado = projetoService.atualizar(criado.id(), "Projeto Atualizado", Status.EmAndamento, List.of(), now, now.plusDays(2), null, null);
 
@@ -153,7 +147,7 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("Deve atualizar apenas o status de um projeto existente")
     void atualizarStatus() {
-        var criado = projetoService.criar("Projeto Status", Status.AIniciar, List.of(), now, now.plusDays(1), null, null, 0, "0%");
+        var criado = projetoService.criar("Projeto Status", Status.AIniciar, List.of(), now, now.plusDays(1), null, null);
 
         var atualizado = projetoService.atualizarStatus(criado.id(), Status.Concluido);
 
